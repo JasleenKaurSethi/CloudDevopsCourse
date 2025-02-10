@@ -3,6 +3,14 @@
 Refer the link below for the output of the following script 
 https://docs.google.com/document/d/11DZHdAAGgKuQeYa7tJSY8GqN3D7caYvUy_Dlkw-uEeM/edit?usp=sharing
 
+**Tools and Technologies Learnt**
+
+- Linux and Bash scripting
+- Networking fundamentals
+- DevOps - Git, Web servers and AWS services. 
+
+**Tasks Performed**
+
 **Task 1:**
 Task 1: Set Up Necessary Infrastructure
 Create IAM Role:
