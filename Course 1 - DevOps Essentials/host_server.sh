@@ -1,68 +1,74 @@
 #!/bin/bash
 
-# Define cron file path
-CRON_FILE="/etc/cron.d/automation"
+# Set AWS Region
+AWS_REGION="us-east-1"
 
-# Check if cron job file exists, if not, create it
-if [ ! -f "$CRON_FILE" ]; then
-    echo "Cron file for root does not exist, creating..."
-    touch "$CRON_FILE"
-    echo "@daily root /root/Automation_Project/automation.sh" >> "$CRON_FILE"
-fi
+# IAM Role Variables
+IAM_ROLE_NAME="EC2S3AccessRole"
+IAM_POLICY_NAME="EC2S3Policy"
+INSTANCE_PROFILE_NAME="EC2S3InstanceProfile"
 
-# Define S3 bucket name
-s3_bucket="task2-s3bucket"
+# Security Group Variables
+SECURITY_GROUP_NAME="EC2SecurityGroup"
+SECURITY_GROUP_DESCRIPTION="Allow SSH and HTTP access"
+VPC_ID=$(aws ec2 describe-vpcs --query "Vpcs[0].VpcId" --output text --region $AWS_REGION)
 
-# Update package list
-echo "Updating system packages..."
-apt-get update -y
+# EC2 Instance Variables
+EC2_INSTANCE_NAME="MyEC2Instance"
+AMI_ID="ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI ID (Check for your region)
+INSTANCE_TYPE="t2.micro"
+KEY_PAIR_NAME="my-key-pair"  # Change this to your key pair name
 
-# Check if Apache is installed, install if missing
-if ! dpkg -l | grep -q apache2; then
-    echo "Installing Apache Server..."
-    apt-get install apache2 -y
-else
-    echo "Apache2 is already installed"
-fi
+# S3 Bucket Variables
+S3_BUCKET_NAME="my-unique-s3-bucket-$(date +%s)"
 
-# Ensure Apache service is running
-if ! systemctl is-active --quiet apache2; then
-    echo "Starting Apache service..."
-    systemctl start apache2
-else
-    echo "Apache2 service is already running"
-fi
+# Create IAM Role for EC2 to access S3
+echo "Creating IAM Role: $IAM_ROLE_NAME"
+aws iam create-role --role-name $IAM_ROLE_NAME --assume-role-policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": { "Service": "ec2.amazonaws.com" },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}' --region $AWS_REGION
 
-# Create a timestamp for log naming
-timestamp=$(date '+%d%m%Y-%H%M%S')
-name="Jasleen"
-tar_file_name="$name-httpd-logs-$timestamp.tar.gz"
+# Attach S3 access policy to IAM Role
+echo "Attaching policy to IAM Role"
+aws iam put-role-policy --role-name $IAM_ROLE_NAME --policy-name $IAM_POLICY_NAME --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": ["s3:*"],
+            "Resource": ["*"]
+        }
+    ]
+}' --region $AWS_REGION
 
-# Archive Apache logs
-echo "Creating log archive: $tar_file_name"
-tar -zcvf "/tmp/$tar_file_name" /var/log/apache2/*.log
+# Create an Instance Profile and attach the IAM role
+aws iam create-instance-profile --instance-profile-name $INSTANCE_PROFILE_NAME --region $AWS_REGION
+aws iam add-role-to-instance-profile --instance-profile-name $INSTANCE_PROFILE_NAME --role-name $IAM_ROLE_NAME --region $AWS_REGION
 
-# Copy archive to S3
-if aws s3 cp "/tmp/$tar_file_name" "s3://$s3_bucket/$tar_file_name"; then
-    echo "Log file successfully uploaded to S3."
-else
-    echo "Error: Failed to upload log file to S3."
-fi
+# Create Security Group
+echo "Creating Security Group: $SECURITY_GROUP_NAME"
+SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "$SECURITY_GROUP_DESCRIPTION" --vpc-id $VPC_ID --query "GroupId" --output text --region $AWS_REGION)
 
-# Define inventory file path
-inventory_file="/var/www/html/inventory.html"
+# Add Inbound Rules (Allow SSH and HTTP)
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr 0.0.0.0/0 --region $AWS_REGION
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 80 --cidr 0.0.0.0/0 --region $AWS_REGION
 
-# Check if inventory file exists, create it if missing
-if [ ! -f "$inventory_file" ]; then
-    echo "Creating inventory.html file..."
-    touch "$inventory_file"
-    echo -e "Log Type\tTime Created\t\tType\tSize" > "$inventory_file"
-fi
+# Launch EC2 Instance
+echo "Launching EC2 Instance: $EC2_INSTANCE_NAME"
+INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_PAIR_NAME --security-group-ids $SECURITY_GROUP_ID --iam-instance-profile Name=$INSTANCE_PROFILE_NAME --query "Instances[0].InstanceId" --output text --region $AWS_REGION)
 
-# Get log file size
-log_size=$(du -h "/tmp/$tar_file_name" | awk '{print $1}')
+# Tag EC2 Instance
+aws ec2 create-tags --resources $INSTANCE_ID --tags Key=Name,Value=$EC2_INSTANCE_NAME --region $AWS_REGION
 
-# Append log details to inventory
-echo -e "httpd-logs\t$timestamp\tTar\t$log_size" >> "$inventory_file"
+# Create an S3 Bucket
+echo "Creating S3 Bucket: $S3_BUCKET_NAME"
+aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $AWS_REGION --create-bucket-configuration LocationConstraint=$AWS_REGION
 
-echo "Script execution completed successfully."
+echo "Script execution completed."
