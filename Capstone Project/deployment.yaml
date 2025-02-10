@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: easy-notes
+  name: easy-notes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: easy-notes-pod
+  template:
+    metadata:
+      labels:
+        app: easy-notes-pod
+    spec:
+      tolerations:
+        - key: "special"
+          value: "true"
+          effect: "NoSchedule"
+      containers:
+        - name: easy-notes
+          image: 498037000272.dkr.ecr.us-east-1.amazonaws.com/capstone-repo:helloworld
+          ports:
+            - containerPort: 3000
+      restartPolicy: Always
