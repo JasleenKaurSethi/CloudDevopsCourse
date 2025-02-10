@@ -12,6 +12,7 @@ https://docs.google.com/document/d/11DZHdAAGgKuQeYa7tJSY8GqN3D7caYvUy_Dlkw-uEeM/
 **Tasks Performed**
 
 **Task 1:**
+
 *Task 1: Set Up Necessary Infrastructure: IAM Role, Launch EC2 Instance, Attach Security Group*
 Create IAM Role:
 
@@ -36,7 +37,8 @@ Attach Security Group:
 
 **Task 2:**
 
-Task 2: Apache Logs Automation & S3 Backup
+*Task 2: Apache Logs Automation & S3 Backup*
+
 Update System & Install Apache2 (if not installed).
 Ensure Apache2 is Running & Enabled at startup.
 Archive Apache Logs (.log files) from /var/log/apache2/ to /tmp/ with format:
@@ -49,7 +51,8 @@ Tag: Automation-v0.1
 
 **Task 3:**
 
-Task 3: Bookkeeping & Automation
+*Task 3: Bookkeeping & Automation*
+
 Inventory File (inventory.html):
 
 Check/Create in /var/www/html/.
