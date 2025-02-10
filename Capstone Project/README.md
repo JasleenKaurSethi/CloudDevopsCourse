@@ -5,7 +5,7 @@ This project is the final project levaraging all the concepts taught in the 6 mo
 **Tools and Technologies Learnt**
 
 - AWS & Terraform: AWS CLI, EKS, Terraform, eksctl, ECR, AWS Load Balancer Controller
-- Kubernetes & Tools: Kubernetes, Terraform, Ansible, Helm, HPA, Cluster Autoscaler, Kubernetes Metrics Server
+- Kubernetes & Tools: Kubernetes, Terraform, Ansible, Helm, HPA, Cluster Autoscaler, Kubernetes Metrics Server, Linux, Bash Scripting, Python
 - Docker & Redis: Docker, ECR, Redis, StatefulSets
 - Monitoring & Scaling: Prometheus, Apache Benchmark (ab)
 
