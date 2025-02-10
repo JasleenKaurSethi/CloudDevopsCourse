@@ -12,16 +12,16 @@ https://docs.google.com/document/d/11DZHdAAGgKuQeYa7tJSY8GqN3D7caYvUy_Dlkw-uEeM/
 **Tasks Performed**
 
 **Task 1:**
-Task 1: Set Up Necessary Infrastructure
+*Task 1: Set Up Necessary Infrastructure: IAM Role, Launch EC2 Instance, Attach Security Group*
 Create IAM Role:
 
-Role Name: YourFirstName_CourseAssignment
+Role Name: 
 Attach Policy: AmazonS3FullAccess
 Tag: (EC2, S3Full)
 Create Security Group:
 
-Name: SG_YourFirstName
-Description: Required for Course Assignment
+Name: 
+Description: 
 Open Ports: 80, 443, 22
 Tag: WebServer Sec
 Launch EC2 Instance:
@@ -30,9 +30,9 @@ Region: us-east-1 (North Virginia)
 AMI: Ubuntu Server 18.04 LTS (HVM)
 Type: t2.micro
 VPC: Default VPC
-Attach IAM Role: YourFirstName_CourseAssignment
+Attach IAM Role: 
 Tag: Name=Web Server
-Attach Security Group: SG_YourFirstName
+Attach Security Group: 
 
 **Task 2:**
 
