@@ -1,3 +1,5 @@
+**OUTPUT SCREENSHOTS**
+
 Refer the link below for the output of the following script 
 https://docs.google.com/document/d/11DZHdAAGgKuQeYa7tJSY8GqN3D7caYvUy_Dlkw-uEeM/edit?usp=sharing
 
@@ -23,7 +25,9 @@ VPC: Default VPC
 Attach IAM Role: YourFirstName_CourseAssignment
 Tag: Name=Web Server
 Attach Security Group: SG_YourFirstName
+
 **Task 2:**
+
 Task 2: Apache Logs Automation & S3 Backup
 Update System & Install Apache2 (if not installed).
 Ensure Apache2 is Running & Enabled at startup.
@@ -34,7 +38,9 @@ Host Script on GitHub:
 Repo: Automation_Project
 Branch: Dev → PR → Merge to Main
 Tag: Automation-v0.1
+
 **Task 3:**
+
 Task 3: Bookkeeping & Automation
 Inventory File (inventory.html):
 
